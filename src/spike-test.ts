@@ -1,8 +1,9 @@
 import http from 'k6/http';
 import { check, sleep } from 'k6';
+import { Options } from 'k6/options';
 
 // Spike Test Configuration - Sudden traffic surge
-export const options = {
+export const options: Options = {
   stages: [
     { duration: '30s', target: 5 },    // Low baseline
     { duration: '10s', target: 100 },  // Sudden spike!
@@ -21,9 +22,9 @@ export const options = {
 
 const BASE_URL = 'https://jsonplaceholder.typicode.com';
 
-export default function () {
+export default function (): void {
   // Test most common user flows during spike
-  
+
   // 1. Browse posts (most common)
   let response = http.get(`${BASE_URL}/posts`);
   check(response, {
@@ -32,7 +33,7 @@ export default function () {
   sleep(0.5);
 
   // 2. View specific post
-  const postId = Math.floor(Math.random() * 100) + 1;
+  const postId: number = Math.floor(Math.random() * 100) + 1;
   response = http.get(`${BASE_URL}/posts/${postId}`);
   check(response, {
     'GET /posts/:id status OK': (r) => r.status === 200,
