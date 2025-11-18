@@ -10,11 +10,11 @@ const errorRate = new Rate('errors');
 // Test configuration
 export const options: Options = {
   stages: [
-    { duration: '30s', target: 10 },  // Ramp-up to 10 users
-    { duration: '1m', target: 10 },   // Stay at 10 users
-    { duration: '30s', target: 20 },  // Ramp-up to 20 users
-    { duration: '1m', target: 20 },   // Stay at 20 users
-    { duration: '30s', target: 0 },   // Ramp-down to 0 users
+    { duration: '20s', target: 10 },  // Ramp-up to 10 users
+    { duration: '40s', target: 10 },  // Stay at 10 users
+    { duration: '20s', target: 20 },  // Ramp-up to 20 users
+    { duration: '40s', target: 20 },  // Stay at 20 users
+    { duration: '20s', target: 0 },   // Ramp-down to 0 users
   ],
   thresholds: {
     http_req_duration: ['p(95)<500'], // 95% of requests should be below 500ms
@@ -250,35 +250,35 @@ export function testGetAlbums(): void {
 export default function (): void {
   group('Posts API Tests', () => {
     testGetAllPosts();
-    sleep(1);
+    sleep(0.3);
 
     testGetSinglePost();
-    sleep(1);
+    sleep(0.3);
 
     testGetPostComments();
-    sleep(1);
+    sleep(0.3);
 
     testCreatePost();
-    sleep(1);
+    sleep(0.3);
 
     testUpdatePost();
-    sleep(1);
+    sleep(0.3);
 
     testPatchPost();
-    sleep(1);
+    sleep(0.3);
 
     testDeletePost();
-    sleep(1);
+    sleep(0.3);
   });
 
   group('Other Resources Tests', () => {
     testGetUsers();
-    sleep(1);
+    sleep(0.3);
 
     testGetTodos();
-    sleep(1);
+    sleep(0.3);
 
     testGetAlbums();
-    sleep(1);
+    sleep(0.3);
   });
 }
