@@ -39,18 +39,23 @@ jobs:
     name: Health Check
     runs-on: ubuntu-latest
     needs: build
+    continue-on-error: true  # Don't fail pipeline if external API is down
 
     steps:
       - name: Check JSONPlaceholder API availability
+        continue-on-error: true  # Report status but don't block pipeline
         run: |
-          set -e
           echo "Checking JSONPlaceholder API health..."
+          echo "Note: This is an external API health check. Failures here indicate the third-party service is experiencing issues."
+          echo ""
 
           # Function to check API with retry logic
           check_api() {
             local max_attempts=3
             local timeout=10
             local attempt=1
+            local last_response=""
+            local last_exit=0
 
             while [ $attempt -le $max_attempts ]; do
               echo "Attempt $attempt of $max_attempts..."
@@ -61,22 +66,25 @@ jobs:
               curl_exit=$?
               set -e
 
-              echo "Debug: curl exit code: $curl_exit, response: '$response'"
+              last_response="$response"
+              last_exit=$curl_exit
+
+              echo "  curl exit code: $curl_exit, HTTP status: '$response'"
 
               # Check if curl command succeeded
               if [ $curl_exit -ne 0 ]; then
-                echo "⚠ curl failed with exit code $curl_exit"
+                echo "  ⚠ Network error (curl exit code $curl_exit)"
                 if [ $attempt -lt $max_attempts ]; then
-                  echo "Retrying in 2 seconds..."
+                  echo "  Retrying in 2 seconds..."
                   sleep 2
                 fi
               elif [ "$response" = "200" ]; then
-                echo "✓ API is healthy (HTTP $response)"
+                echo "  ✓ API is healthy (HTTP $response)"
                 return 0
               else
-                echo "⚠ API returned HTTP $response"
+                echo "  ⚠ API returned HTTP $response (server error)"
                 if [ $attempt -lt $max_attempts ]; then
-                  echo "Retrying in 2 seconds..."
+                  echo "  Retrying in 2 seconds..."
                   sleep 2
                 fi
               fi
@@ -84,36 +92,42 @@ jobs:
               attempt=$((attempt + 1))
             done
 
-            echo "✗ API health check failed after $max_attempts attempts"
+            echo ""
+            echo "⚠ WARNING: JSONPlaceholder API is currently unavailable or unhealthy"
+            echo "  Last HTTP status: $last_response"
+            echo "  Last curl exit code: $last_exit"
+            echo ""
+            echo "This is an external dependency issue and does not indicate a problem with your code."
             return 1
           }
 
           # Run the health check with retries
-          if ! check_api; then
-            exit 1
-          fi
+          if check_api; then
+            echo ""
+            echo "✓ Health check passed - API is available and healthy"
 
-          # Check response time
-          echo ""
-          echo "Checking API response time..."
-          time_total=$(curl -s -o /dev/null -w "%{time_total}" --max-time 10 https://jsonplaceholder.typicode.com/posts 2>&1)
-          echo "✓ API response time: ${time_total}s"
+            # Additional checks only if API is healthy
+            echo ""
+            echo "Checking API response time..."
+            time_total=$(curl -s -o /dev/null -w "%{time_total}" --max-time 10 https://jsonplaceholder.typicode.com/posts 2>&1)
+            echo "✓ API response time: ${time_total}s"
 
-          # Verify we can get data
-          echo ""
-          echo "Verifying API returns valid data..."
-          data=$(curl -s --max-time 10 https://jsonplaceholder.typicode.com/posts/1 2>&1)
+            echo ""
+            echo "Verifying API returns valid data..."
+            data=$(curl -s --max-time 10 https://jsonplaceholder.typicode.com/posts/1 2>&1)
 
-          if echo "$data" | grep -q "userId"; then
-            echo "✓ API returns valid JSON data"
+            if echo "$data" | grep -q "userId"; then
+              echo "✓ API returns valid JSON data"
+            else
+              echo "⚠ API did not return expected data structure"
+              echo "Response: $data"
+            fi
           else
-            echo "✗ API did not return expected data"
-            echo "Response received: $data"
-            exit 1
+            echo "⚠ Health check completed with warnings - proceeding anyway"
           fi
 
           echo ""
-          echo "✓ Health check completed successfully!"
+          echo "Health check step finished (non-blocking)"
 
   performance-tests:
     name: Performance Tests
