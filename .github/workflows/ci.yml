@@ -43,6 +43,7 @@ jobs:
     steps:
       - name: Check JSONPlaceholder API availability
         run: |
+          set -e
           echo "Checking JSONPlaceholder API health..."
 
           # Function to check API with retry logic
@@ -55,9 +56,21 @@ jobs:
               echo "Attempt $attempt of $max_attempts..."
 
               # Check if the API is reachable with timeout
-              response=$(curl -s -o /dev/null -w "%{http_code}" --max-time $timeout https://jsonplaceholder.typicode.com/posts)
+              set +e
+              response=$(curl -s -o /dev/null -w "%{http_code}" --max-time $timeout https://jsonplaceholder.typicode.com/posts 2>&1)
+              curl_exit=$?
+              set -e
 
-              if [ $response -eq 200 ]; then
+              echo "Debug: curl exit code: $curl_exit, response: '$response'"
+
+              # Check if curl command succeeded
+              if [ $curl_exit -ne 0 ]; then
+                echo "⚠ curl failed with exit code $curl_exit"
+                if [ $attempt -lt $max_attempts ]; then
+                  echo "Retrying in 2 seconds..."
+                  sleep 2
+                fi
+              elif [ "$response" = "200" ]; then
                 echo "✓ API is healthy (HTTP $response)"
                 return 0
               else
@@ -83,13 +96,13 @@ jobs:
           # Check response time
           echo ""
           echo "Checking API response time..."
-          time_total=$(curl -s -o /dev/null -w "%{time_total}" --max-time 10 https://jsonplaceholder.typicode.com/posts)
+          time_total=$(curl -s -o /dev/null -w "%{time_total}" --max-time 10 https://jsonplaceholder.typicode.com/posts 2>&1)
           echo "✓ API response time: ${time_total}s"
 
           # Verify we can get data
           echo ""
           echo "Verifying API returns valid data..."
-          data=$(curl -s --max-time 10 https://jsonplaceholder.typicode.com/posts/1)
+          data=$(curl -s --max-time 10 https://jsonplaceholder.typicode.com/posts/1 2>&1)
 
           if echo "$data" | grep -q "userId"; then
             echo "✓ API returns valid JSON data"
