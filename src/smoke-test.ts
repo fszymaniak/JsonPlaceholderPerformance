@@ -26,7 +26,7 @@ export default function (): void {
   let response = http.get(`${BASE_URL}/posts`);
   check(response, {
     'GET /posts - status 200': (r) => r.status === 200,
-    'GET /posts - has data': (r) => r.json() && Array.isArray(r.json()) && (r.json() as Post[]).length > 0,
+    'GET /posts - has data': (r) => !!r.json() && Array.isArray(r.json()) && (r.json() as unknown as Post[]).length > 0,
   });
   sleep(0.5);
 
@@ -34,7 +34,7 @@ export default function (): void {
   response = http.get(`${BASE_URL}/posts/1`);
   check(response, {
     'GET /posts/1 - status 200': (r) => r.status === 200,
-    'GET /posts/1 - has title': (r) => (r.json() as Post).title !== undefined,
+    'GET /posts/1 - has title': (r) => (r.json() as unknown as Post).title !== undefined,
   });
   sleep(0.5);
 
@@ -50,7 +50,7 @@ export default function (): void {
   });
   check(response, {
     'POST /posts - status 201': (r) => r.status === 201,
-    'POST /posts - returns id': (r) => (r.json() as Post).id !== undefined,
+    'POST /posts - returns id': (r) => (r.json() as unknown as Post).id !== undefined,
   });
   sleep(0.5);
 

@@ -1,0 +1,121 @@
+name: CI Pipeline
+
+on:
+  push:
+    branches: [ main, master, claude/** ]
+  pull_request:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build:
+    name: Build
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Build project
+        run: npm run build
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: dist
+          path: dist/
+          retention-days: 1
+
+  health-check:
+    name: Health Check
+    runs-on: ubuntu-latest
+    needs: build
+
+    steps:
+      - name: Check JSONPlaceholder API availability
+        run: |
+          echo "Checking JSONPlaceholder API health..."
+
+          # Check if the API is reachable
+          response=$(curl -s -o /dev/null -w "%{http_code}" https://jsonplaceholder.typicode.com/posts)
+
+          if [ $response -eq 200 ]; then
+            echo "✓ API is healthy (HTTP $response)"
+          else
+            echo "✗ API health check failed (HTTP $response)"
+            exit 1
+          fi
+
+          # Check response time
+          echo "Checking API response time..."
+          time_total=$(curl -s -o /dev/null -w "%{time_total}" https://jsonplaceholder.typicode.com/posts)
+          echo "✓ API response time: ${time_total}s"
+
+          # Verify we can get data
+          echo "Verifying API returns valid data..."
+          data=$(curl -s https://jsonplaceholder.typicode.com/posts/1)
+
+          if echo "$data" | grep -q "userId"; then
+            echo "✓ API returns valid JSON data"
+          else
+            echo "✗ API did not return expected data"
+            exit 1
+          fi
+
+          echo "Health check completed successfully!"
+
+  performance-tests:
+    name: Performance Tests
+    runs-on: ubuntu-latest
+    needs: health-check
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Download build artifacts
+        uses: actions/download-artifact@v4
+        with:
+          name: dist
+          path: dist/
+
+      - name: Install k6
+        run: |
+          sudo gpg -k
+          sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+          echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+          sudo apt-get update
+          sudo apt-get install k6
+
+      - name: Run smoke test
+        run: k6 run dist/smoke-test.js
+
+      - name: Run load test
+        run: k6 run dist/jsonplaceholder-load-test.js
+
+      - name: Run stress test
+        run: k6 run dist/stress-test.js
+        continue-on-error: true
+
+      - name: Run spike test
+        run: k6 run dist/spike-test.js
+        continue-on-error: true
+
+      - name: Run soak test
+        run: k6 run dist/soak-test.js
+        continue-on-error: true
+
+      - name: Performance test summary
+        if: always()
+        run: |
+          echo "Performance testing completed!"
+          echo "Check the logs above for detailed results."
