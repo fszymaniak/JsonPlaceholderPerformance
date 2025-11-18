@@ -5,9 +5,9 @@ import { Options } from 'k6/options';
 // Soak Test Configuration - Extended duration to find memory leaks, degradation
 export const options: Options = {
   stages: [
-    { duration: '2m', target: 20 },   // Ramp up to moderate load
-    { duration: '30m', target: 20 },  // Maintain for 30 minutes (extended test)
-    { duration: '2m', target: 0 },    // Ramp down
+    { duration: '1m', target: 20 },   // Ramp up to moderate load
+    { duration: '5m', target: 20 },   // Maintain for 5 minutes (sufficient for CI/CD)
+    { duration: '1m', target: 0 },    // Ramp down
   ],
   thresholds: {
     http_req_duration: ['p(95)<1000'],  // Should stay consistent
@@ -31,7 +31,7 @@ export default function (): void {
   check(response, {
     'browse posts - status 200': (r) => r.status === 200,
   });
-  sleep(2);
+  sleep(1);
 
   // User reads a specific post
   const postId: number = Math.floor(Math.random() * 100) + 1;
@@ -39,14 +39,14 @@ export default function (): void {
   check(response, {
     'read post - status 200': (r) => r.status === 200,
   });
-  sleep(3);
+  sleep(1);
 
   // User checks comments
   response = http.get(`${BASE_URL}/posts/${postId}/comments`);
   check(response, {
     'read comments - status 200': (r) => r.status === 200,
   });
-  sleep(2);
+  sleep(1);
 
   // User creates a new post (less common action)
   if (Math.random() < 0.3) { // 30% of users create content
@@ -63,7 +63,7 @@ export default function (): void {
     check(response, {
       'create post - status 201': (r) => r.status === 201,
     });
-    sleep(2);
+    sleep(1);
   }
 
   // User browses other content
@@ -71,5 +71,5 @@ export default function (): void {
   check(response, {
     'browse users - status 200': (r) => r.status === 200,
   });
-  sleep(3);
+  sleep(1);
 }

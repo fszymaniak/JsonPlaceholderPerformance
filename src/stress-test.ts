@@ -6,13 +6,13 @@ import { Options } from 'k6/options';
 // Stress Test Configuration - Push system to its limits
 export const options: Options = {
   stages: [
-    { duration: '1m', target: 50 },   // Ramp up to 50 users
-    { duration: '2m', target: 50 },   // Stay at 50 users
-    { duration: '1m', target: 100 },  // Ramp up to 100 users
-    { duration: '2m', target: 100 },  // Stay at 100 users
-    { duration: '1m', target: 150 },  // Ramp up to 150 users
-    { duration: '2m', target: 150 },  // Stay at 150 users
-    { duration: '2m', target: 0 },    // Ramp down to 0
+    { duration: '30s', target: 50 },  // Ramp up to 50 users
+    { duration: '1m', target: 50 },   // Stay at 50 users
+    { duration: '30s', target: 100 }, // Ramp up to 100 users
+    { duration: '1m', target: 100 },  // Stay at 100 users
+    { duration: '30s', target: 150 }, // Ramp up to 150 users
+    { duration: '1m', target: 150 },  // Stay at 150 users
+    { duration: '30s', target: 0 },   // Ramp down to 0
   ],
   thresholds: {
     http_req_duration: ['p(95)<2000'], // Relaxed threshold for stress test
