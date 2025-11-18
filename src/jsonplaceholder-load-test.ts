@@ -71,7 +71,7 @@ export function testGetAllPosts(): void {
 
   const success = check(response, {
     'status is 200': (r) => r.status === 200,
-    'response has posts': (r) => Array.isArray(r.json()) && (r.json() as Post[]).length > 0,
+    'response has posts': (r) => Array.isArray(r.json()) && (r.json() as unknown as Post[]).length > 0,
     'response time < 500ms': (r) => r.timings.duration < 500,
   });
 
@@ -85,8 +85,8 @@ export function testGetSinglePost(): void {
 
   const success = check(response, {
     'status is 200': (r) => r.status === 200,
-    'post has id': (r) => (r.json() as Post).id !== undefined,
-    'post has title': (r) => (r.json() as Post).title !== undefined,
+    'post has id': (r) => (r.json() as unknown as Post).id !== undefined,
+    'post has title': (r) => (r.json() as unknown as Post).title !== undefined,
     'response time < 300ms': (r) => r.timings.duration < 300,
   });
 
@@ -100,7 +100,7 @@ export function testGetPostComments(): void {
 
   const success = check(response, {
     'status is 200': (r) => r.status === 200,
-    'has comments': (r) => Array.isArray(r.json()) && (r.json() as Comment[]).length > 0,
+    'has comments': (r) => Array.isArray(r.json()) && (r.json() as unknown as Comment[]).length > 0,
     'response time < 500ms': (r) => r.timings.duration < 500,
   });
 
@@ -129,7 +129,7 @@ export function testCreatePost(): void {
 
   const success = check(response, {
     'status is 201': (r) => r.status === 201,
-    'response has id': (r) => (r.json() as Post).id !== undefined,
+    'response has id': (r) => (r.json() as unknown as Post).id !== undefined,
     'response time < 600ms': (r) => r.timings.duration < 600,
   });
 
@@ -160,7 +160,7 @@ export function testUpdatePost(): void {
 
   const success = check(response, {
     'status is 200': (r) => r.status === 200,
-    'id matches': (r) => (r.json() as Post).id === postId,
+    'id matches': (r) => (r.json() as unknown as Post).id === postId,
     'response time < 600ms': (r) => r.timings.duration < 600,
   });
 
@@ -213,7 +213,7 @@ export function testGetUsers(): void {
 
   const success = check(response, {
     'status is 200': (r) => r.status === 200,
-    'has users': (r) => Array.isArray(r.json()) && (r.json() as User[]).length > 0,
+    'has users': (r) => Array.isArray(r.json()) && (r.json() as unknown as User[]).length > 0,
     'response time < 500ms': (r) => r.timings.duration < 500,
   });
 
@@ -226,7 +226,7 @@ export function testGetTodos(): void {
 
   const success = check(response, {
     'status is 200': (r) => r.status === 200,
-    'has todos': (r) => Array.isArray(r.json()) && (r.json() as Todo[]).length > 0,
+    'has todos': (r) => Array.isArray(r.json()) && (r.json() as unknown as Todo[]).length > 0,
     'response time < 500ms': (r) => r.timings.duration < 500,
   });
 
@@ -239,7 +239,7 @@ export function testGetAlbums(): void {
 
   const success = check(response, {
     'status is 200': (r) => r.status === 200,
-    'has albums': (r) => Array.isArray(r.json()) && (r.json() as Album[]).length > 0,
+    'has albums': (r) => Array.isArray(r.json()) && (r.json() as unknown as Album[]).length > 0,
     'response time < 500ms': (r) => r.timings.duration < 500,
   });
 
