@@ -20,14 +20,14 @@ export const options: Options = {
 const BASE_URL = 'https://jsonplaceholder.typicode.com';
 
 export default function (): void {
-  // Test most common user flows during spike
+  // Test most common user flows during spike with minimal delays
 
   // 1. Browse posts (most common)
   let response = http.get(`${BASE_URL}/posts`);
   check(response, {
     'GET /posts status OK': (r) => r.status === 200,
   });
-  sleep(0.5);
+  sleep(0.2);
 
   // 2. View specific post
   const postId: number = Math.floor(Math.random() * 100) + 1;
@@ -35,12 +35,12 @@ export default function (): void {
   check(response, {
     'GET /posts/:id status OK': (r) => r.status === 200,
   });
-  sleep(0.5);
+  sleep(0.2);
 
   // 3. Check comments
   response = http.get(`${BASE_URL}/posts/${postId}/comments`);
   check(response, {
     'GET comments status OK': (r) => r.status === 200,
   });
-  sleep(0.3);
+  sleep(0.2);
 }
