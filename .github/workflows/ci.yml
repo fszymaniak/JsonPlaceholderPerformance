@@ -45,33 +45,62 @@ jobs:
         run: |
           echo "Checking JSONPlaceholder API health..."
 
-          # Check if the API is reachable
-          response=$(curl -s -o /dev/null -w "%{http_code}" https://jsonplaceholder.typicode.com/posts)
+          # Function to check API with retry logic
+          check_api() {
+            local max_attempts=3
+            local timeout=10
+            local attempt=1
 
-          if [ $response -eq 200 ]; then
-            echo "✓ API is healthy (HTTP $response)"
-          else
-            echo "✗ API health check failed (HTTP $response)"
+            while [ $attempt -le $max_attempts ]; do
+              echo "Attempt $attempt of $max_attempts..."
+
+              # Check if the API is reachable with timeout
+              response=$(curl -s -o /dev/null -w "%{http_code}" --max-time $timeout https://jsonplaceholder.typicode.com/posts)
+
+              if [ $response -eq 200 ]; then
+                echo "✓ API is healthy (HTTP $response)"
+                return 0
+              else
+                echo "⚠ API returned HTTP $response"
+                if [ $attempt -lt $max_attempts ]; then
+                  echo "Retrying in 2 seconds..."
+                  sleep 2
+                fi
+              fi
+
+              attempt=$((attempt + 1))
+            done
+
+            echo "✗ API health check failed after $max_attempts attempts"
+            return 1
+          }
+
+          # Run the health check with retries
+          if ! check_api; then
             exit 1
           fi
 
           # Check response time
+          echo ""
           echo "Checking API response time..."
-          time_total=$(curl -s -o /dev/null -w "%{time_total}" https://jsonplaceholder.typicode.com/posts)
+          time_total=$(curl -s -o /dev/null -w "%{time_total}" --max-time 10 https://jsonplaceholder.typicode.com/posts)
           echo "✓ API response time: ${time_total}s"
 
           # Verify we can get data
+          echo ""
           echo "Verifying API returns valid data..."
-          data=$(curl -s https://jsonplaceholder.typicode.com/posts/1)
+          data=$(curl -s --max-time 10 https://jsonplaceholder.typicode.com/posts/1)
 
           if echo "$data" | grep -q "userId"; then
             echo "✓ API returns valid JSON data"
           else
             echo "✗ API did not return expected data"
+            echo "Response received: $data"
             exit 1
           fi
 
-          echo "Health check completed successfully!"
+          echo ""
+          echo "✓ Health check completed successfully!"
 
   performance-tests:
     name: Performance Tests
