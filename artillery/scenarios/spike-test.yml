@@ -1,0 +1,41 @@
+config:
+  target: "https://jsonplaceholder.typicode.com"
+  phases:
+    # Normal load
+    - duration: 120
+      arrivalRate: 5
+      name: "Normal load - 5 users/sec"
+
+    # First spike
+    - duration: 60
+      arrivalRate: 150
+      name: "Spike #1 - 150 users/sec"
+
+    # Recovery
+    - duration: 120
+      arrivalRate: 5
+      name: "Recovery - 5 users/sec"
+
+    # Second spike
+    - duration: 60
+      arrivalRate: 150
+      name: "Spike #2 - 150 users/sec"
+
+    # Final recovery
+    - duration: 120
+      arrivalRate: 5
+      name: "Final recovery - 5 users/sec"
+  defaults:
+    headers:
+      User-Agent: "Artillery Spike Test"
+
+scenarios:
+  - name: "Spike Scenario"
+    flow:
+      - get:
+          url: "/posts"
+      - think: 0.2
+
+      - get:
+          url: "/posts/{{ $randomNumber(1, 100) }}"
+      - think: 0.2
