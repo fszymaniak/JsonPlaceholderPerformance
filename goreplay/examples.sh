@@ -1,0 +1,18 @@
+#!/bin/bash
+
+echo "GoReplay Examples"
+echo "================="
+echo ""
+echo "1. Record API traffic to file:"
+echo "   sudo gor --input-raw :443 --output-file api-traffic.gor"
+echo ""
+echo "2. Replay traffic to test environment:"
+echo "   gor --input-file api-traffic.gor --output-http 'http://test-api.com'"
+echo ""
+echo "3. Shadow live traffic (10% rate):"
+echo "   sudo gor --input-raw :443 --output-http 'http://test-api.com|10%'"
+echo ""
+echo "4. Replay with rate limiting:"
+echo "   gor --input-file api-traffic.gor \\"
+echo "       --output-http 'http://test-api.com' \\"
+echo "       --output-http-rate-limit 100"
