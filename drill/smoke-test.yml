@@ -1,0 +1,10 @@
+---
+concurrency: 1
+base: 'https://jsonplaceholder.typicode.com'
+iterations: 100
+rampup: 2
+
+plan:
+  - name: Get posts
+    request:
+      url: /posts
