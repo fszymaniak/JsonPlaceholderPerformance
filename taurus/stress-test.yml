@@ -1,0 +1,53 @@
+---
+# Taurus Stress Test Configuration
+# Push the system to its limits (50-150 users, 14min)
+
+execution:
+  - concurrency: 50
+    ramp-up: 2m
+    hold-for: 2m
+    scenario: stress-test
+  - concurrency: 100
+    ramp-up: 2m
+    hold-for: 5m
+    scenario: stress-test
+  - concurrency: 150
+    ramp-up: 2m
+    hold-for: 3m
+    scenario: stress-test
+
+scenarios:
+  stress-test:
+    default-address: https://jsonplaceholder.typicode.com
+    requests:
+      - url: /posts
+        method: GET
+        label: GET /posts
+        think-time: 0.2s
+
+      - url: /posts/${__Random(1,100)}
+        method: GET
+        label: GET /posts/:id
+        think-time: 0.2s
+
+      - url: /posts
+        method: POST
+        label: POST /posts
+        headers:
+          Content-Type: application/json
+        body:
+          title: "Stress test post ${__Random(1,1000)}"
+          body: "Testing under high stress"
+          userId: ${__Random(1,10)}
+        think-time: 0.2s
+
+reporting:
+  - module: console
+  - module: final-stats
+  - module: blazemeter
+    test: JSONPlaceholder Stress Test
+    project: JSONPlaceholder Performance
+
+modules:
+  jmeter:
+    version: 5.6.3

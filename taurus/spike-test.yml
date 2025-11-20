@@ -1,0 +1,59 @@
+---
+# Taurus Spike Test Configuration
+# Test sudden traffic surges (5-150 users with spike patterns)
+
+execution:
+  # Normal load phase
+  - concurrency: 5
+    ramp-up: 10s
+    hold-for: 2m
+    scenario: spike-test
+
+  # First spike
+  - concurrency: 150
+    ramp-up: 5s
+    hold-for: 1m
+    scenario: spike-test
+
+  # Recovery phase
+  - concurrency: 5
+    ramp-up: 10s
+    hold-for: 2m
+    scenario: spike-test
+
+  # Second spike
+  - concurrency: 150
+    ramp-up: 5s
+    hold-for: 1m
+    scenario: spike-test
+
+  # Final recovery
+  - concurrency: 5
+    ramp-up: 10s
+    hold-for: 2m
+    scenario: spike-test
+
+scenarios:
+  spike-test:
+    default-address: https://jsonplaceholder.typicode.com
+    requests:
+      - url: /posts
+        method: GET
+        label: GET /posts
+        think-time: 0.2s
+
+      - url: /posts/${__Random(1,100)}
+        method: GET
+        label: GET /posts/:id
+        think-time: 0.2s
+
+reporting:
+  - module: console
+  - module: final-stats
+  - module: blazemeter
+    test: JSONPlaceholder Spike Test
+    project: JSONPlaceholder Performance
+
+modules:
+  jmeter:
+    version: 5.6.3

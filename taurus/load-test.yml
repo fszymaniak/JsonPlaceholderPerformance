@@ -1,0 +1,79 @@
+---
+# Taurus Load Test Configuration
+# Comprehensive API testing with gradual ramp-up (10-50 users, 7min)
+
+execution:
+  - concurrency: 50
+    ramp-up: 2m
+    hold-for: 5m
+    scenario: load-test
+
+scenarios:
+  load-test:
+    default-address: https://jsonplaceholder.typicode.com
+    requests:
+      - url: /posts
+        method: GET
+        label: GET /posts
+        think-time: 0.3s
+
+      - url: /posts/${__Random(1,100)}
+        method: GET
+        label: GET /posts/:id
+        think-time: 0.3s
+
+      - url: /posts/${__Random(1,100)}/comments
+        method: GET
+        label: GET /posts/:id/comments
+        think-time: 0.3s
+
+      - url: /posts
+        method: POST
+        label: POST /posts
+        headers:
+          Content-Type: application/json
+        body:
+          title: "Load test post ${__Random(1,1000)}"
+          body: "Testing under load"
+          userId: ${__Random(1,10)}
+        think-time: 0.3s
+
+      - url: /posts/${__Random(1,100)}
+        method: PUT
+        label: PUT /posts/:id
+        headers:
+          Content-Type: application/json
+        body:
+          id: ${__Random(1,100)}
+          title: "Updated title"
+          body: "Updated body"
+          userId: 1
+        think-time: 0.3s
+
+      - url: /posts/${__Random(1,100)}
+        method: DELETE
+        label: DELETE /posts/:id
+        think-time: 0.3s
+
+      - url: /users
+        method: GET
+        label: GET /users
+        think-time: 0.3s
+
+      - url: /todos
+        method: GET
+        label: GET /todos
+        think-time: 0.3s
+
+reporting:
+  - module: console
+  - module: final-stats
+  - module: blazemeter
+    test: JSONPlaceholder Load Test
+    project: JSONPlaceholder Performance
+
+modules:
+  jmeter:
+    version: 5.6.3
+    properties:
+      jmeter.save.saveservice.response_data: false
