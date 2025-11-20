@@ -1,0 +1,15 @@
+{
+  "name": "autocannon-jsonplaceholder-tests",
+  "version": "1.0.0",
+  "description": "Autocannon performance tests for JSONPlaceholder API",
+  "scripts": {
+    "test:smoke": "autocannon -c 1 -d 30 https://jsonplaceholder.typicode.com/posts",
+    "test:load": "node tests/load-test.js",
+    "test:stress": "node tests/stress-test.js",
+    "test:spike": "node tests/spike-test.js",
+    "test:soak": "node tests/soak-test.js"
+  },
+  "devDependencies": {
+    "autocannon": "^7.12.0"
+  }
+}
