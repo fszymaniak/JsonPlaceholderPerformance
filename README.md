@@ -65,17 +65,18 @@ npm run test:soak
 
 ## Test Files
 
-- `src/smoke-test.ts` - Basic health check
-- `src/jsonplaceholder-load-test.ts` - Comprehensive load test
-- `src/stress-test.ts` - High load stress test
-- `src/spike-test.ts` - Sudden traffic spike test
-- `src/soak-test.ts` - Extended duration test
+- `k6/smoke-test.ts` - Basic health check
+- `k6/jsonplaceholder-load-test.ts` - Comprehensive load test
+- `k6/stress-test.ts` - High load stress test
+- `k6/spike-test.ts` - Sudden traffic spike test
+- `k6/soak-test.ts` - Extended duration test
 
 ## Project Structure
 
 ```
 .
-├── src/                    # TypeScript source files
+├── k6/                     # k6 TypeScript source files
+├── nbomber/                # NBomber C# test files
 ├── dist/                   # Compiled JavaScript files (generated)
 ├── package.json            # Project dependencies and scripts
 ├── tsconfig.json          # TypeScript configuration

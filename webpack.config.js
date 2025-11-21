@@ -3,11 +3,11 @@ const path = require('path');
 module.exports = {
   mode: 'production',
   entry: {
-    'smoke-test': './src/smoke-test.ts',
-    'spike-test': './src/spike-test.ts',
-    'soak-test': './src/soak-test.ts',
-    'stress-test': './src/stress-test.ts',
-    'jsonplaceholder-load-test': './src/jsonplaceholder-load-test.ts'
+    'smoke-test': './k6/smoke-test.ts',
+    'spike-test': './k6/spike-test.ts',
+    'soak-test': './k6/soak-test.ts',
+    'stress-test': './k6/stress-test.ts',
+    'jsonplaceholder-load-test': './k6/jsonplaceholder-load-test.ts'
   },
   output: {
     path: path.resolve(__dirname, 'dist'),
