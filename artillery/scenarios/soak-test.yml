@@ -1,0 +1,32 @@
+config:
+  target: "https://jsonplaceholder.typicode.com"
+  phases:
+    - duration: 1800  # 30 minutes
+      arrivalRate: 20
+      name: "Soak test - 30 minutes at 20 users/sec"
+  defaults:
+    headers:
+      User-Agent: "Artillery Soak Test"
+
+scenarios:
+  - name: "Soak Test Scenario"
+    flow:
+      - get:
+          url: "/posts"
+      - think: 0.3
+
+      - get:
+          url: "/posts/{{ $randomNumber(1, 100) }}"
+      - think: 0.3
+
+      - get:
+          url: "/posts/{{ $randomNumber(1, 100) }}/comments"
+      - think: 0.3
+
+      - post:
+          url: "/posts"
+          json:
+            title: "Soak test {{ $randomNumber(1, 1000) }}"
+            body: "Testing for extended duration"
+            userId: "{{ $randomNumber(1, 10) }}"
+      - think: 0.3

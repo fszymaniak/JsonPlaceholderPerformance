@@ -1,0 +1,65 @@
+config:
+  target: "https://jsonplaceholder.typicode.com"
+  phases:
+    - duration: 120
+      arrivalRate: 10
+      name: "Ramp up to 10 users/sec"
+    - duration: 180
+      arrivalRate: 20
+      name: "Sustained load at 20 users/sec"
+    - duration: 120
+      arrivalRate: 50
+      name: "Peak load at 50 users/sec"
+  defaults:
+    headers:
+      User-Agent: "Artillery Load Test"
+
+scenarios:
+  - name: "Read Operations"
+    weight: 50
+    flow:
+      - get:
+          url: "/posts"
+      - think: 0.3
+
+      - get:
+          url: "/posts/{{ $randomNumber(1, 100) }}"
+      - think: 0.3
+
+      - get:
+          url: "/posts/{{ $randomNumber(1, 100) }}/comments"
+      - think: 0.3
+
+  - name: "Write Operations"
+    weight: 30
+    flow:
+      - post:
+          url: "/posts"
+          json:
+            title: "Load test post {{ $randomNumber(1, 1000) }}"
+            body: "Testing under load"
+            userId: "{{ $randomNumber(1, 10) }}"
+      - think: 0.3
+
+      - put:
+          url: "/posts/{{ $randomNumber(1, 100) }}"
+          json:
+            id: "{{ $randomNumber(1, 100) }}"
+            title: "Updated title"
+            body: "Updated body"
+            userId: 1
+      - think: 0.3
+
+  - name: "Mixed Operations"
+    weight: 20
+    flow:
+      - get:
+          url: "/users"
+      - think: 0.3
+
+      - get:
+          url: "/todos"
+      - think: 0.3
+
+      - delete:
+          url: "/posts/{{ $randomNumber(1, 100) }}"
