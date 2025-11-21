@@ -17,7 +17,7 @@
     "types": ["k6"]
   },
   "include": [
-    "src/**/*"
+    "k6/**/*"
   ],
   "exclude": [
     "node_modules",
