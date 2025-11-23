@@ -1,0 +1,14 @@
+POST https://jsonplaceholder.typicode.com/posts
+Content-Type: application/json
+
+{"title":"Vegeta POST test 1","body":"Testing POST requests","userId":1}
+
+POST https://jsonplaceholder.typicode.com/posts
+Content-Type: application/json
+
+{"title":"Vegeta POST test 2","body":"Testing POST requests","userId":2}
+
+POST https://jsonplaceholder.typicode.com/posts
+Content-Type: application/json
+
+{"title":"Vegeta POST test 3","body":"Testing POST requests","userId":3}

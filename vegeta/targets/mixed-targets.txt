@@ -1,0 +1,19 @@
+GET https://jsonplaceholder.typicode.com/posts
+
+GET https://jsonplaceholder.typicode.com/posts/1
+
+GET https://jsonplaceholder.typicode.com/users
+
+POST https://jsonplaceholder.typicode.com/posts
+Content-Type: application/json
+
+{"title":"Vegeta test post","body":"Testing POST with Vegeta","userId":1}
+
+PUT https://jsonplaceholder.typicode.com/posts/1
+Content-Type: application/json
+
+{"id":1,"title":"Updated post","body":"Updated with Vegeta","userId":1}
+
+DELETE https://jsonplaceholder.typicode.com/posts/1
+
+GET https://jsonplaceholder.typicode.com/todos
