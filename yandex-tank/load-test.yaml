@@ -1,0 +1,12 @@
+phantom:
+  address: jsonplaceholder.typicode.com:443
+  ssl: true
+  load_profile:
+    load_type: rps
+    schedule: line(10, 50, 5m)
+  uris:
+    - /posts
+    - /users
+    - /todos
+console:
+  enabled: true
