@@ -1,0 +1,20 @@
+<?xml version="1.0"?>
+<!DOCTYPE tsung SYSTEM "/usr/share/tsung/tsung-1.0.dtd">
+<tsung loglevel="notice">
+  <clients>
+    <client host="localhost" use_controller_vm="true"/>
+  </clients>
+  <servers>
+    <server host="jsonplaceholder.typicode.com" port="443" type="ssl"/>
+  </servers>
+  <load>
+    <arrivalphase phase="1" duration="30" unit="second">
+      <users arrivalrate="1" unit="second"/>
+    </arrivalphase>
+  </load>
+  <sessions>
+    <session name="smoke" probability="100" type="ts_http">
+      <request><http url="/posts" method="GET"/></request>
+    </session>
+  </sessions>
+</tsung>
