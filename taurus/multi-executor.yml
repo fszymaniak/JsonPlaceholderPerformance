@@ -1,0 +1,50 @@
+---
+# Taurus Multi-Executor Example
+# Demonstrates running tests with different executors (JMeter + Locust)
+
+execution:
+  # JMeter-based execution
+  - executor: jmeter
+    concurrency: 10
+    ramp-up: 1m
+    hold-for: 3m
+    scenario: jmeter-scenario
+
+  # Locust-based execution (if locust is installed)
+  # - executor: locust
+  #   concurrency: 5
+  #   ramp-up: 30s
+  #   hold-for: 2m
+  #   scenario: locust-scenario
+
+scenarios:
+  jmeter-scenario:
+    default-address: https://jsonplaceholder.typicode.com
+    requests:
+      - url: /posts
+        method: GET
+        label: JMeter - GET /posts
+        think-time: 0.5s
+
+      - url: /users
+        method: GET
+        label: JMeter - GET /users
+        think-time: 0.5s
+
+  locust-scenario:
+    default-address: https://jsonplaceholder.typicode.com
+    requests:
+      - url: /todos
+        method: GET
+        label: Locust - GET /todos
+        think-time: 0.5s
+
+reporting:
+  - module: console
+  - module: final-stats
+
+modules:
+  jmeter:
+    version: 5.6.3
+  # locust:
+  #   version: 2.20.0

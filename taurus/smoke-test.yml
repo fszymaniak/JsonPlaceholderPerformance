@@ -1,0 +1,80 @@
+---
+# Taurus Smoke Test Configuration
+# Quick validation with minimal load (1 user, 30s)
+
+execution:
+  - concurrency: 1
+    ramp-up: 5s
+    hold-for: 30s
+    scenario: smoke-test
+
+scenarios:
+  smoke-test:
+    default-address: https://jsonplaceholder.typicode.com
+    requests:
+      - url: /posts
+        method: GET
+        label: GET /posts
+        assert:
+          - contains:
+              - 200
+            subject: http-code
+        think-time: 0.5s
+
+      - url: /posts/1
+        method: GET
+        label: GET /posts/1
+        assert:
+          - contains:
+              - 200
+            subject: http-code
+          - contains:
+              - title
+            subject: body
+        think-time: 0.5s
+
+      - url: /posts
+        method: POST
+        label: POST /posts
+        headers:
+          Content-Type: application/json
+        body:
+          title: "Taurus smoke test"
+          body: "Testing create endpoint"
+          userId: 1
+        assert:
+          - contains:
+              - 201
+            subject: http-code
+        think-time: 0.5s
+
+      - url: /users
+        method: GET
+        label: GET /users
+        assert:
+          - contains:
+              - 200
+            subject: http-code
+        think-time: 0.5s
+
+      - url: /todos
+        method: GET
+        label: GET /todos
+        assert:
+          - contains:
+              - 200
+            subject: http-code
+        think-time: 0.5s
+
+reporting:
+  - module: console
+  - module: final-stats
+  - module: blazemeter
+    test: JSONPlaceholder Smoke Test
+    project: JSONPlaceholder Performance
+
+modules:
+  jmeter:
+    version: 5.6.3
+    properties:
+      jmeter.save.saveservice.response_data: true
