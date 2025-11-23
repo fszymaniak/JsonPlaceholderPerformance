@@ -1,0 +1,5 @@
+https://jsonplaceholder.typicode.com/posts
+https://jsonplaceholder.typicode.com/posts/1
+https://jsonplaceholder.typicode.com/users
+https://jsonplaceholder.typicode.com/todos
+https://jsonplaceholder.typicode.com/posts POST {"title":"Siege test","body":"Testing","userId":1}
