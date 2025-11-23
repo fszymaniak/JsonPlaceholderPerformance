@@ -1,0 +1,21 @@
+name: jsonplaceholder-load
+http:
+  host: https://jsonplaceholder.typicode.com
+  sharedConnections: 100
+phases:
+  - rampUp:
+      duration: 2m
+      maxSessionsEstimate: 50
+      scenario:
+        - getPosts:
+          - httpRequest:
+              GET: /posts
+  - steadyState:
+      duration: 5m
+      maxSessions: 50
+      scenario:
+        - mixedLoad:
+          - httpRequest:
+              GET: /posts
+          - httpRequest:
+              GET: /users

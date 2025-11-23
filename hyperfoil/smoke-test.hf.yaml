@@ -1,0 +1,12 @@
+name: jsonplaceholder-smoke
+http:
+  host: https://jsonplaceholder.typicode.com
+  sharedConnections: 10
+phases:
+  - steadyState:
+      duration: 30s
+      maxSessions: 1
+      scenario:
+        - getPosts:
+          - httpRequest:
+              GET: /posts
